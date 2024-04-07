@@ -28,7 +28,7 @@ public class TicketController {
         return "ticket";
     }
 
-    @GetMapping(value ="/id")
+    @GetMapping(value ="/id/{id}")
     public String showTicket(@PathVariable("id") Long id , Model model){
         log.info("Controller-Ticket-Get-FindById");
         Ticket ticket = ticketServiceImp.findById(id);
@@ -36,7 +36,7 @@ public class TicketController {
             model.addAttribute("ticket", ticket);
             return "ticket";
         }else {
-            return "error-404";
+            return "redirect:/ticket";
         }
     }
 

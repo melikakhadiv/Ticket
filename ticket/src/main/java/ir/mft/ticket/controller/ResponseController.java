@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -32,7 +33,7 @@ public class ResponseController {
         return "response";
     }
 
-    @GetMapping(value ="/id")
+    @GetMapping(value ="/id/{id}")
     public String showResponse(@ModelAttribute("id") Long id){
         log.info("Controller-Response-Get-FindById");
         Response response = responseServiceImp.findById(id);
@@ -56,9 +57,9 @@ public class ResponseController {
     }
 
     @GetMapping(value ="/date")
-    public String showResponsesByApplicant(Model model , @ModelAttribute("timeStamp") LocalDateTime timeStamp) {
+    public String showResponsesByApplicant(Model model , @ModelAttribute("timeStamp") LocalDate responseDate) {
         log.info("Controller-Response-Get-FindByDate");
-        List<Response> responseList = responseServiceImp.findByDate(timeStamp);
+        List<Response> responseList = responseServiceImp.findByDate(responseDate);
         if (!responseList.isEmpty()){
             model.addAttribute("responseList", responseList);
             return "response";
@@ -86,7 +87,7 @@ public class ResponseController {
     public String deleteResponse(Response response) {
         log.info("Controller-Response-Post-Delete");
         responseServiceImp.logicalRemove(response.getId());
-        return "response";
+        return "redirect:/response";
     }
 
 

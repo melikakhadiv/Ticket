@@ -5,8 +5,8 @@ import ir.mft.ticket.repository.ResponseRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,6 +23,8 @@ public class ResponseServiceImp implements ResponseService{
     public Response save(Response response) {
         log.info("Service-Response-Save");
         response.setActive(true);
+        response.setResponseDate(LocalDate.now());
+        response.setResponseTime(LocalTime.now());
         responseRepository.save(response);
         return response;
     }
