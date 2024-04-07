@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Response</title>
+</head>
+<body>
+<h2>Response Page</h2>
+<form th:action="@{/response/save}" method="post" th:object="${response}">
+    <input type="datetime-local" placeholder="time" th:value="${timeStamp}" th:field="*{timeStamp}" >
+    <br>
+    <input type="text" placeholder="responder" th:value="${responder}" th:field="*{responder}">
+    <br>
+    <input type="text" placeholder="response" th:value="${ticketResponse}" th:field="*{ticketResponse}">
+    <br>
+    <input type="submit" value="Save">
+</form>
+<table th:if="${#lists.size(responseList) > 0}">
+    <thead>
+    <th>Id</th>
+    <th>Response Date</th>
+    <th>Responder</th>
+    <th>Response</th>
+    <th>Operation</th>
+    </thead>
+    <tbody>
+    <tr th:each="r : ${responseList}">
+        <td th:text="${r.id}"></td>
+        <td th:text="${r.timeStamp}"></td>
+        <td th:text="${r.responder}"></td>
+        <td th:text="${r.ticketResponse}"></td>
+        <td>
+            <button>Edit</button>
+            <button>Delete</button>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

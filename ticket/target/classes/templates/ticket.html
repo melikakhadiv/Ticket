@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Ticket</title>
+</head>
+<body>
+<h2>Ticket Page</h2>
+
+<form th:action="@{/ticket/save}" method="post" th:object="${ticket}">
+<!--    <input type="date" th:value="${ticketDate}" th:field="*{ticketDate}" >-->
+<!--    <br>-->
+<!--    <input type="time" th:value="${ticketTime}" th:field="*{ticketTime}">-->
+<!--    <br>-->
+    <input type="text" placeholder="applicant" th:value="${applicant}" th:field="*{applicant}">
+    <br>
+    <input type="text" placeholder="request" th:value="${request}" th:field="*{request}">
+    <br>
+    <input type="text" placeholder="group" th:value="${group}" th:field="*{group}">
+    <br>
+    <input type="text"  placeholder="status" th:value="${status}" th:field="*{status}">
+    <br>
+    <input type="submit" value="Save">
+</form>
+<table th:if="${#lists.size(ticketList) > 0}">
+    <thead>
+    <th>Id</th>
+    <th>Ticket Date</th>
+    <th>Ticket Time</th>
+    <th>Applicant</th>
+    <th>Request</th>
+    <th>Group</th>
+    <th>Status</th>
+    <th>Active</th>
+    <th>Operation</th>
+    </thead>
+    <tbody>
+    <tr th:each="t : ${ticketList}">
+        <td th:text="${t.id}"></td>
+        <td th:text="${t.ticketDate}"></td>
+        <td th:text="${t.ticketTime}"></td>
+        <td th:text="${t.applicant}"></td>
+        <td th:text="${t.request}"></td>
+        <td th:text="${t.group}"></td>
+        <td th:text="${t.status}"></td>
+        <td th:text="${t.active}"></td>
+        <td>
+            <button>Edit</button>
+            <form th:action="@{/ticket/delete}" method="post">
+                <input type="text" name="id" th:value="${t.id}" hidden="hidden">
+                <button type="submit">Delete</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
