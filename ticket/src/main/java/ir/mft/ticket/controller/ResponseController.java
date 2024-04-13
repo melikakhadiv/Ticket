@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -30,7 +29,7 @@ public class ResponseController {
         log.info("Controller-Response-Get-FindAll");
         model.addAttribute("response", new Response());
         model.addAttribute("responseList", responseServiceImp.findAll());
-        return "response";
+        return "responseForm";
     }
 
     @GetMapping(value ="/id/{id}")
@@ -38,7 +37,7 @@ public class ResponseController {
         log.info("Controller-Response-Get-FindById");
         Response response = responseServiceImp.findById(id);
         if (response != null){
-            return "response";
+            return "responseForm";
         }else {
             return "error-404";
         }
@@ -50,7 +49,7 @@ public class ResponseController {
         List<Response> responseList = responseServiceImp.findByResponder(responder);
         if (!responseList.isEmpty()){
             model.addAttribute("responseList", responseList);
-            return "response";
+            return "responseForm";
         }else {
             return "error-404";
         }
@@ -62,7 +61,7 @@ public class ResponseController {
         List<Response> responseList = responseServiceImp.findByDate(responseDate);
         if (!responseList.isEmpty()){
             model.addAttribute("responseList", responseList);
-            return "response";
+            return "responseForm";
         }else {
             return "error-404";
         }
@@ -80,7 +79,7 @@ public class ResponseController {
     public String editResponse(Response response) {
         log.info("Controller-Response-Post-Edit");
         responseServiceImp.edit(response);
-        return "response";
+        return "responseForm";
     }
 
     @PostMapping(value ="/delete")

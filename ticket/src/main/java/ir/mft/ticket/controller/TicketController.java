@@ -25,20 +25,36 @@ public class TicketController {
         log.info("Controller-Ticket-Get-FindAll");
         model.addAttribute("ticket", new Ticket());
         model.addAttribute("ticketList", ticketServiceImp.findAll());
-        return "ticket";
+        return "ticketForm";
     }
 
     @GetMapping(value ="/id/{id}")
-    public String showTicket(@PathVariable("id") Long id , Model model){
+    public String showTicketById(@PathVariable("id") Long id , Model model){
         log.info("Controller-Ticket-Get-FindById");
         Ticket ticket = ticketServiceImp.findById(id);
         if (ticket != null){
-            model.addAttribute("ticket", ticket);
-            return "ticket";
+            log.info(ticket.toString());
+            model.addAttribute("ticketEdit", ticket);
+            log.info(ticket.toString());
+            return "redirect:/ticke";
         }else {
             return "redirect:/ticket";
         }
     }
+
+//    @GetMapping(value ="/id")
+//    public String showTicket( Long id , Model model){
+//        log.info("Controller-Ticket-Get-FindById");
+//        Ticket ticket = ticketServiceImp.findById(id);
+//        if (ticket != null){
+//            log.info(ticket.toString());
+//            model.addAttribute("ticketEdit", ticket);
+//            log.info(ticket.toString());
+//            return "redirect:/ticket";
+//        }else {
+//            return "ticketForm";
+//        }
+//    }
 
     @GetMapping(value ="/applicant")
     public String showTicketsByApplicant(Model model , @ModelAttribute("applicant") String applicant) {
@@ -46,7 +62,7 @@ public class TicketController {
         List<Ticket> ticketList = ticketServiceImp.findByApplicant(applicant);
         if (!ticketList.isEmpty()){
             model.addAttribute("ticketList", ticketList);
-            return "ticket";
+            return "ticketForm";
         }else {
             return "error-404";
         }
@@ -58,7 +74,7 @@ public class TicketController {
         List<Ticket> ticketList = ticketServiceImp.findByDate(date);
         if (!ticketList.isEmpty()){
             model.addAttribute("ticketList", ticketList);
-            return "ticket";
+            return "ticketForm";
         }else {
             return "error-404";
         }
@@ -75,8 +91,9 @@ public class TicketController {
     @PostMapping(value ="/edit")
     public String editTicket(Ticket ticket) {
         log.info("Controller-Ticket-Post-Edit");
+        log.info("Controller-Ticket-Post-Edit" + ticket.toString());
         ticketServiceImp.edit(ticket);
-        return "ticket";
+        return "redirect:/ticket";
     }
 
     @PostMapping(value ="/delete")

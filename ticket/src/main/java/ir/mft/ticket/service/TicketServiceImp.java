@@ -38,6 +38,7 @@ public class TicketServiceImp implements TicketService {
         log.info("Service-Ticket-Edit");
         ticket.setActive(true);
         if (findById(ticket.getId()) != null) {
+            log.info("Service-Ticket-Edit" + ticket);
             ticketRepository.save(ticket);
             return ticket;
         } else return null;

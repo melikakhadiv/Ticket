@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Ticket</title>
+</head>
+<body>
+<h2>Ticket Page</h2>
+
+<form id="form" th:action="@{/ticket/save}" method="post" th:object="${ticket}">
+    <input type="text" placeholder="applicant" th:value="${applicant}" th:field="*{applicant}">
+    <br>
+    <input type="text" placeholder="request" th:value="${request}" th:field="*{request}">
+    <br>
+    <input type="text" placeholder="group" th:value="${group}" th:field="*{group}">
+    <br>
+    <input type="text"  placeholder="status" th:value="${status}" th:field="*{status}">
+    <br>
+    <input type="submit" value="Save">
+</form>
+<table th:if="${ticketList != null} ">
+    <thead>
+    <th>Id</th>
+    <th>Ticket Date</th>
+    <th>Ticket Time</th>
+    <th>Applicant</th>
+    <th>Request</th>
+    <th>Group</th>
+    <th>Status</th>
+    <th>Active</th>
+    <th>Operation</th>
+    </thead>
+    <tbody>
+    <tr th:each="t : ${ticketList}">
+        <td th:text="${t.id}"></td>
+        <td th:text="${t.ticketDate}"></td>
+        <td th:text="${t.ticketTime}"></td>
+        <td th:text="${t.applicant}"></td>
+        <td th:text="${t.request}"></td>
+        <td th:text="${t.group}"></td>
+        <td th:text="${t.status}"></td>
+        <td th:text="${t.active}"></td>
+        <td>
+            <button th:onclick="'edit(\'' + ${t.id} + '\')'">Edit</button>
+<!--            <form th:action="@{/ticket/id}" method="get">-->
+<!--                <input th:name="id" th:value="${t.id}" hidden="hidden">-->
+<!--                <button type="submit"> Find</button>-->
+<!--            </form>-->
+            <form th:action="@{/ticket/delete}" method="post">
+                <input type="text" name="id" th:value="${t.id}" hidden="hidden">
+                <button type="submit">Delete</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<div th:if="${ticketEdit != null}">
+    <p>Applicant: <span th:text="${ticketEdit.applicant}"></span></p>
+    <p>Request: <span th:text="${ticketEdit.request}"></span></p>
+    <p>Group: <span th:text="${ticketEdit.group}"></span></p>
+    <p>Status: <span th:text="${ticketEdit.status}"></span></p>;
+</div>
+
+<!--Modal Edit-->
+<div class="display:hidden" id="modalEdit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true" >
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header text-center">
+                <h4 class="modal-title w-100 font-weight-bold">ویرایش اطلاعات</h4>
+<!--                <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="resetData()">-->
+<!--                    <span aria-hidden="true">&times;</span>-->
+<!--                </button>-->
+            </div>
+            <form th:action="@{/ticket/edit}" id="ticketEdit" method="post" th:object="${ticket}">
+                <div class="modal-body mx-3">
+                    <div class="md-form mb-4 ">
+                        <label class="float-right" data-error="wrong" data-success="right" for="idTxt">شناسه</label>
+                        <input class="form-control validate" id="idTxt" type="number" name="id" placeholder="Id"
+                             >
+                    </div>
+
+                    <div class="md-form mb-4">
+                        <label class="float-right" data-error="wrong" data-success="right" for="applicantTxt">نام
+                            کاربری</label>
+                        <input class="form-control validate" id="applicantTxt"  placeholder="applicant">
+                    </div>
+
+                    <div class="md-form mb-4">
+                        <label class="float-right" data-error="wrong" data-success="right" for="requestTxt">رمز
+                            عبور</label>
+                        <input class="form-control validate" id="requestTxt" type="text"  placeholder="request"
+                        >
+                    </div>
+
+                    <div class="md-form mb-4">
+                        <label class="float-right" data-error="wrong" data-success="right" for="groupTxt">
+                            نام</label>
+                        <input class="form-control validate" id="groupTxt" type="text"
+                               placeholder="group">
+                    </div>
+
+                </div>
+
+                <div class="modal-footer d-flex justify-content-center">
+<!--                    <button class="btn btn-indigo" onclick="editFrom()">ذخیره اطلاعات <i-->
+<!--                            class="fas fa-paper-plane-o ml-1"></i>-->
+                    </button><button class="btn btn-indigo" type="submit">ذخیره اطلاعات <i
+                            class="fas fa-paper-plane-o ml-1"></i></button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    async function edit(id){
+        // $("#modalEdit").modal('toggle');
+        document.getElementById('modalEdit').style.display = 'block';
+        console.log("EDit")
+        const resp =await fetch("/ticket/id/" +id , {
+           method:"get"
+       });
+        // const data = resp.jso);
+        console.log(resp)
+    }
+</script>
+</body>
+</html>
