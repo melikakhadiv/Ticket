@@ -29,16 +29,17 @@ public class TicketController {
     }
 
     @GetMapping(value ="/id/{id}")
-    public String showTicketById(@PathVariable("id") Long id , Model model){
+    @ResponseBody
+    public Ticket showTicketById(@PathVariable("id") Long id , Model model){
         log.info("Controller-Ticket-Get-FindById");
         Ticket ticket = ticketServiceImp.findById(id);
         if (ticket != null){
             log.info(ticket.toString());
-            model.addAttribute("ticketEdit", ticket);
+//            model.addAttribute("ticketEdit", ticket);
             log.info(ticket.toString());
-            return "redirect:/ticke";
+            return ticket;
         }else {
-            return "redirect:/ticket";
+            return null;
         }
     }
 
@@ -69,7 +70,7 @@ public class TicketController {
     }
 
     @GetMapping(value ="/date")
-    public String showTicketsByApplicant(Model model , @ModelAttribute("date") LocalDate date) {
+    public String showTicketsByDate(Model model , @ModelAttribute("date") LocalDate date) {
         log.info("Controller-Ticket-Get-FindByDate");
         List<Ticket> ticketList = ticketServiceImp.findByDate(date);
         if (!ticketList.isEmpty()){
