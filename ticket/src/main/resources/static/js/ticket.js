@@ -5,8 +5,7 @@ function addTicket(){
 
 async function findId(id) {
     let editModal = document.getElementById("editModalTicket")
-    let modalTicket = new bootstrap.Modal(editModal);
-    modalTicket.show();
+    editModal.style.display = 'block';
     const resp = await fetch("/ticket/" + id, {
         method: "get"
     });
@@ -16,6 +15,7 @@ async function findId(id) {
     let ticketTitle = document.getElementById("title__edit__ticket");
     // let ticketApplicant = document.getElementById("applicant__edit__ticket");
     let ticketRequest = document.getElementById("request__edit__ticket");
+    let ticketSection = document.getElementById("section__edit__ticket");
     let ticketGroup = document.getElementById("group__edit__ticket");
     let ticketStatus = document.getElementById("status__edit__ticket");
     let ticketDeleted = document.getElementById("deleted__edit__ticket");
@@ -26,20 +26,22 @@ async function findId(id) {
     ticketTitle.value = data.title;
     // ticketApplicant.value = data.applicant.username;
     ticketRequest.value = data.request;
+    ticketSection.value = data.section.title;
     ticketGroup.value = data.group.title;
     ticketStatus.value = data.status;
     ticketDeleted.value = data.deleted;
 
 }
 
-function handleSelectChange(event, selectTagId) {
+
+function handleSelectChangeTicket(event, selectTagId) {
     const selectedId = event.target.value;
     getSubGroups(selectedId, selectTagId);
 }
 
 async function getSubGroups(id, selectTagId) {
     const resp = await fetch("/ticketGroup/parent/" + id, {
-        method: "get"
+        method: "GET"
     });
 
     let childId;
@@ -82,9 +84,10 @@ async function getSubGroups(id, selectTagId) {
 }
 
 async function edit() {
-    // todo : close modal then pop up
+    let editModal = document.getElementById("editModalTicket")
+    editModal.style.display = 'none';
     const formData = new FormData(document.getElementById("editFormTicket"));
-    console.log(formData)
+
     if (confirm("از صحت اطلاعات وارد شده اطمینان دارید؟")) {
         const response = await fetch("/ticket", {method: "put", body: formData});
         if (!response.ok) {
@@ -97,7 +100,8 @@ async function edit() {
 }
 
 async function save() {
-    // todo : close modal then pop up
+    let saveModal = document.getElementById("saveModalTicket")
+    saveModal.style.display='none'
     const saveFormData = new FormData(saveFormTicket);
 
     if (confirm("از صحت اطلاعات وارد شده اطمینان دارید؟")) {
@@ -125,10 +129,29 @@ async function deleted(id) {
 
 }
 
+
+
 function closeModal(){
     let saveModal = document.getElementById("saveModalTicket")
-
+    let editModal = document.getElementById("editModalTicket")
+    editModal.style.display = 'none';
     saveModal.style.display = "none"
 }
+
+
+const statusElements = document.querySelectorAll('td[id="status"]');
+statusElements.forEach(statusElement => {
+    const status = statusElement.textContent.trim();
+    if (status === 'answered') {
+        statusElement.classList.add('success');
+    } else if (status === 'closed') {
+        statusElement.classList.add('danger');
+    } else if (status === 'postponed') {
+        statusElement.classList.add('warning');
+    } else if (status === 'seen') {
+        statusElement.classList.add('seen');
+    }
+    console.log("Classes applied:", statusElement.classList);
+});
 
 

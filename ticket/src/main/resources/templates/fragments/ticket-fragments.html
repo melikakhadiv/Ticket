@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div th:fragment="ticketSaveFormContent(title,request,group)">
+    <label for="parent__add__ticket">Field :</label>
+    <select id="parent__add__ticket"
+            th:if="${#lists.size(ticketGroupParents) > 0}"
+            onchange="handleSelectChangeTicket(event , 'parent__add__ticket')">
+        <option selected disabled value="-1">Select The Relevant Group:</option>
+        <option th:each="ticketGroup : ${ticketGroupParents}"
+                th:value="${ticketGroup.id}"
+                th:text="${ticketGroup.title}"
+                th:data-name="${ticketGroup.id}">
+        </option>
+    </select>
+
+    <label for="child__add__ticket" style="display: none">Sub Group :</label>
+    <select id="child__add__ticket" style="display: none">
+    </select>
+
+    <label for="title__add__ticket">Title :</label>
+    <input type="text" name="title" id="title__add__ticket">
+
+    <label for="request__add__ticket">Request :</label>
+    <input type="text" name="request" id="request__add__ticket">
+
+
+</div>
+
+<div th:fragment="ticketEditFormContent(title,status,request,ticketTimeStamp,status,state,group)">
+    <label for="group__edit__ticket">Group :</label>
+    <input type="text" id="group__edit__ticket"  readonly>
+
+    <label for="parent__edit__ticket" >Field :</label>
+    <select id="parent__edit__ticket"
+            th:if="${#lists.size(ticketGroupParents) > 0}"
+            onchange="handleSelectChangeTicket(event , 'parent__edit__ticket')">
+        <option selected disabled value="-1">Select The Relevant Group:</option>
+        <option th:each="ticketGroup : ${ticketGroupParents}"
+                th:value="${ticketGroup.id}"
+                th:text="${ticketGroup.title}"
+                th:data-name="${ticketGroup.id}">
+        </option>
+    </select>
+
+    <label for="child__edit__ticket"  style="display: none">Sub Group :</label>
+    <select id="child__edit__ticket" style="display: none"
+            aria-label="Default select example">
+    </select>
+
+
+    <label for="title__edit__ticket">Title :</label>
+    <input type="text" id="title__edit__ticket" name="title">
+
+    <label for="request__edit__ticket">Request :</label>
+    <input type="text" id="request__edit__ticket" name="request">
+
+    <label for="ticketTimeStamp__edit__ticket">Date :</label>
+    <input type="datetime-local"  id="ticketTimeStamp__edit__ticket"
+           name="ticketTimeStamp" readonly>
+
+    <label for="status__edit__ticket">Status :</label>
+    <select id="status__edit__ticket"
+            name="status">
+        <option selected disabled value="-1">Choose Ticket Status :</option>
+        <option value="answered">Answered</option>
+        <option value="postponed">Postponed</option>
+        <option value="closed">Closed</option>
+    </select>
+
+    <label for="deleted__edit__ticket">State:</label>
+    <select id="deleted__edit__ticket"
+            name="deleted">
+        <option selected disabled value="-1">Choose Ticket State :</option>
+        <option value="true">Not Active</option>
+        <option value="false">Active</option>
+    </select>
+
+
+
+</div>
+
+</body>
+</html>

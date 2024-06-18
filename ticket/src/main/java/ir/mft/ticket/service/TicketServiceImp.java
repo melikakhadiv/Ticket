@@ -1,69 +1,76 @@
 package ir.mft.ticket.service;
 
+
+import ir.mft.ticket.enums.Status;
+import ir.mft.ticket.exceptions.NoContentException;
 import ir.mft.ticket.model.Ticket;
 import ir.mft.ticket.repository.TicketRepository;
+import ir.mft.ticket.service.imp.TicketService;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.Calendar;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 @Slf4j
 public class TicketServiceImp implements TicketService {
-    private TicketRepository ticketRepository;
+    private final TicketRepository ticketRepository;
 
     public TicketServiceImp(TicketRepository ticketRepository) {
         this.ticketRepository = ticketRepository;
     }
 
     @Override
-    public Ticket save(Ticket ticket) {
+    public Ticket save(Ticket ticket) throws NoContentException {
         log.info("Service-Ticket-Save");
-        ticket.setActive(true);
-        ticket.setTicketDate(LocalDate.now());
-        ticket.setTicketTime(LocalTime.now());
-        log.info(ticket.toString());
+        ticket.setStatus(Status.postponed);
+        ticket.setDeleted(false);
+        ticket.setTicketTimeStamp(LocalDateTime.now());
         ticketRepository.save(ticket);
         return ticket;
     }
 
     @Override
-    public Ticket edit(Ticket ticket) {
+    @Transactional
+    public Ticket edit(Ticket ticket) throws NoContentException {
         log.info("Service-Ticket-Edit");
-        ticket.setActive(true);
-        if (findById(ticket.getId()) != null) {
-            log.info("Service-Ticket-Edit" + ticket);
-            ticketRepository.save(ticket);
-            return ticket;
-        } else return null;
+        ticketRepository.findById(ticket.getId()).orElseThrow(
+                () -> new NoContentException("No Ticket Found with id : " + ticket.getId()));
+        return ticketRepository.save(ticket);
+    }
+
+
+    @Override
+    @Transactional
+    public Ticket editStatusById(Long id, Status status) throws NoContentException {
+        log.info("Service-Ticket-Edit");
+        Optional<Ticket> ticket = ticketRepository.findById(id);
+        ticket.orElseThrow(
+                () -> new NoContentException("No Ticket Found with id : " + id));
+        ticket.get().setStatus(status);
+        return ticketRepository.save(ticket.get());
     }
 
     @Override
-    public Ticket remove(Ticket ticket) {
+    public void remove(Ticket ticket) throws NoContentException {
         log.info("Service-Ticket-Remove");
-        if (findById(ticket.getId()) != null) {
-            ticketRepository.delete(ticket);
-            return ticket;
-        } else return null;
+        ticketRepository.findById(ticket.getId()).orElseThrow(
+                () -> new NoContentException("No Ticket Found with id : " + ticket.getId()));
+        ticketRepository.delete(ticket);
     }
 
     @Override
     @Transactional
-    public Ticket logicalRemove(Long id) {
+    public Ticket logicalRemove(Long id) throws NoContentException {
         log.info("Service-Ticket-LogicalRemove");
-        Ticket ticket = findById(id);
-        log.info("Service-Ticket-LogicalRemove: " + ticket);
-        if (ticket != null) {
-            ticket.setActive(false);
-            ticketRepository.save(ticket);
-            return ticket;
-        } else return null;
+        Ticket ticket = ticketRepository.findById(id).orElseThrow(
+                () -> new NoContentException("No Ticket Found with id : " + id));
+        ticket.setDeleted(true);
+        return ticketRepository.save(ticket);
+
     }
 
     @Override
@@ -74,24 +81,42 @@ public class TicketServiceImp implements TicketService {
     }
 
     @Override
-    public Ticket findById(Long id) {
-        log.info("Service-Ticket-FindById");
-        Optional<Ticket> ticket = ticketRepository.findById(id);
-        log.info("Service-Ticket-FindById: " + ticket.get());
-        return (ticket.isPresent() ? ticket.get() : null);
-    }
-
-    @Override
-    public List<Ticket> findByApplicant(String applicant) {
-        log.info("Service-Ticket-FindByApplicant");
-        List<Ticket> ticketList = ticketRepository.findByApplicant(applicant);
+    public List<Ticket> findAllDeletedFalse() {
+        log.info("Service-Ticket-FindAllDeletedFalse");
+        List<Ticket> ticketList = ticketRepository.findAllDeletedFalse();
         return ticketList;
     }
 
     @Override
-    public List<Ticket> findByDate(LocalDate timeStamp) {
+    public List<String> findAllTitle() {
+        log.info("Service-Ticket-FindAllTitle");
+        List<String> ticketList = ticketRepository.findAllTitle();
+        return ticketList;
+    }
+
+    @Override
+    public List<Ticket> findByTitle(String title) {
+        log.info("Service-Ticket-FindByTitle");
+        List<Ticket> ticketList = ticketRepository.findByTitle(title);
+        return ticketList;
+    }
+
+    @Override
+    public Ticket findById(Long id) throws NoContentException {
+        log.info("Service-Ticket-FindById");
+        return ticketRepository.findById(id).orElseThrow(
+                () -> new NoContentException("No Ticket Found with id : " + id)
+        );
+    }
+
+
+
+    @Override
+    public List<Ticket> findByDate(LocalDateTime timeStamp) throws NoContentException {
         log.info("Service-Ticket-FindByDate");
         List<Ticket> ticketList = ticketRepository.findByDate(timeStamp);
-        return ticketList;
+        if (!ticketList.isEmpty()) {
+            return ticketList;
+        } else throw new NoContentException("Ticket Not Found !");
     }
 }

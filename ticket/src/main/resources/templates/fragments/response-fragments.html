@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<div th:fragment="responseSaveFormContent(responseReponse,response)">
+<!--    todo: edit ticket status  -->
+    <label for="responseGroup__add__response">Field :</label>
+    <select id="responseGroup__add__response"
+            th:if="${#lists.size(ticketGroupList) > 0}"
+            onchange="handleSelectChangeResponse(event , 'responseGroup__add__response')">
+        <option selected disabled value="-1">Select The Relevant Group:</option>
+        <option th:each="responseGroup : ${ticketGroupList}"
+                th:value="${responseGroup}"
+                th:text="${responseGroup}"
+                th:data-name="${responseGroup}">
+        </option>
+    </select>
+
+    <label for="ticket__add__response"  style="display: none">Ticket :</label>
+    <select id="ticket__add__response" onchange="handleSelectChangeResponseStatus(event)" style="display: none">
+    </select>
+
+
+    <label for="ticketResponse__add__response">Response :</label>
+    <input type="textarea" name="ticketResponse" id="ticketResponse__add__response">
+
+
+</div>
+
+
+</div>
+
+<div th:fragment="responseEditFormContent(ticketReponse,timeStamp,status,ticket)">
+
+    <label for="responseGroup__edit__response">Ticket Group :</label>
+    <input type="text"  id="responseGroup__edit__response" readonly>
+
+    <label for="ticket__edit__response">Request :</label>
+    <input type="text"  id="ticket__edit__response" readonly>
+
+    <label for="ticketId__edit__response">Request :</label>
+    <input type="text"  id="ticketId__edit__response"
+           name="ticket" readonly style="display:none;">
+
+    <label for="responseTimeStamp__edit__response">Date :</label>
+    <input type="datetime-local"  id="responseTimeStamp__edit__response"
+           name="responseTimeStamp" readonly>
+
+    <label for="deleted__edit__response">State:</label>
+    <select id="deleted__edit__response"
+            name="deleted">
+        <option selected disabled value="-1">Choose Response State :</option>
+        <option value="true">Not Active</option>
+        <option value="false">Active</option>
+    </select>
+
+    <label for="ticketResponse__edit__response">Response :</label>
+    <input type="textarea" name="ticketResponse" id="ticketResponse__edit__response">
+</div>
+
+
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Response</title>
+    <link rel="stylesheet" href="../static/css/response.css">
+    <link rel="stylesheet" href="../static/css/popup.css">
+</head>
+<body>
+<h2>Response Page</h2>
+
+<div class="container">
+    <div>
+        <button type="button" class="save-button" onclick="addResponse()">Add New Response</button>
+    </div>
+
+
+    <table th:if="${#lists.size(responseList) > 0}">
+        <thead>
+        <th>Id</th>
+        <th>Response Date</th>
+        <th>Response Time</th>
+        <!--    <th>Responder</th>-->
+        <th>Response</th>
+        <th>Ticket</th>
+        <th>Active</th>
+        <th>Operation</th>
+        </thead>
+        <tbody>
+        <tr th:each="response : ${responseList}">
+            <td th:text="${response.id}"></td>
+            <td th:text="${response.responseTimeStamp.toLocalDate()}"></td>
+            <td th:text="${response.responseTimeStamp.toLocalTime()}"></td>
+            <!--        <td th:text="${response.responder}"></td>-->
+            <td th:text="${response.ticketResponse}"></td>
+            <td th:text="${response.ticket.group.title} + ' : ' + ${response.ticket.title}"
+                th:data-name="${response.ticket.id}" th:onclick="setStatus(this.getAttribute('data-name'))"></td>
+            <td th:text="${response.deleted}"></td>
+            <td>
+                <button class="edit-button" th:data-name="${response.id}"
+                        th:onclick="findId(this.getAttribute('data-name'))">Edit
+                </button>
+                <button class="delete-button" th:data-name="${response.id}"
+                        th:onclick="deleted(this.getAttribute('data-name'))">Delete
+                </button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div id="saveModalResponse">
+        <div id="saveModalResponseContent">
+            <form id="saveFormResponse">
+                <div th:replace="~{/fragments/response-fragments :: responseSaveFormContent('ticketReponse','ticket') }"></div>
+            </form>
+            <div class="modal-footer">
+                <button onclick="save()" class="save-button">Save</button>
+                <button onclick="closeModal()" class="close-button">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="editModalResponse">
+        <div id="editModalResponseContent">
+            <form id="editFormResponse">
+                <label for="id__edit__response">ID :</label>
+                <input type="text" id="id__edit__response" name="id" readonly>
+                <div th:replace="~{/fragments/response-fragments :: responseEditFormContent('ticketReponse','timeStamp','status','ticket')}"></div>
+            </form>
+            <div class="modal-footer">
+                <button onclick="edit()" class="edit-button">Edit</button>
+                <button onclick="closeModal()" class="close-button">Close</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+<div th:replace="~{/fragments/popup-fragment}"></div>
+
+
+<script type="text/javascript" src="../static/js/popup.js"></script>
+<script type="text/javascript" src="../static/js/response.js"></script>
+</body>
+</html>

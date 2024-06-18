@@ -12,14 +12,14 @@
     --border-left-color :transparent;
 }
 
-body{
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #f2f2f2;
-    overflow: hidden;
-}
+/*body{*/
+/*    height: 100vh;*/
+/*    display: flex;*/
+/*    align-items: center;*/
+/*    justify-content: center;*/
+/*    background-color: #f2f2f2;*/
+/*    overflow: hidden;*/
+/*}*/
 
 .popup{
     position: absolute;

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div th:fragment="ticketGroupSaveFormContent(parent , title)">
+    <label for="parent__add__ticketGroup">Field :</label>
+    <select
+            id="parent__add__ticketGroup"
+            name="parent" th:if="${#lists.size(ticketGroupParents) > 0}">
+        <option selected value="-1"></option>
+        <option th:each="ticketGroup : ${ticketGroupParents}"
+                th:value="${ticketGroup.id}"
+                th:text="${ticketGroup.title}">
+        </option>
+    </select>
+    <label for="title__add__ticketGroup">Title :</label>
+    <input type="text" name="title" id="title__add__ticketGroup">
+</div>
+
+<div th:fragment="ticketGroupEditFormContent(parent,title)">
+    <label for="parent__edit__ticketGroup">Field :</label>
+    <select id="parent__edit__ticketGroup"
+            name="parent" th:if="${#lists.size(ticketGroupParents) > 0}">
+        <option selected value="-1"></option>
+        <option th:each="ticketGroup : ${ticketGroupParents}"
+                th:value="${ticketGroup.id}"
+                th:text="${ticketGroup.title}">
+        </option>
+    </select>
+
+    <label for="title__edit__ticketGroup" class="col-form-label">Title :</label>
+    <input type="text" name="title" class="form-control" id="title__edit__ticketGroup">
+</div>
+</body>
+</html>

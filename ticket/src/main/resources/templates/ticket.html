@@ -2,29 +2,24 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="webjars/bootstrap/5.3.2/css/bootstrap.css">
-    <link rel="stylesheet" href="/css/popup.css">
-    <link rel="stylesheet" href="/css/ticket.css">
+    <link rel="stylesheet" href="../static/css/popup.css">
+    <link rel="stylesheet" href="../static/css/ticket.css">
     <title>Ticket</title>
 </head>
 <body>
 <h2>Ticket Page</h2>
 
 <div class="container">
-    <div class="navBar">
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#saveModalTicket">Add New
-            Ticket
-        </button>
+    <div>
+        <button type="button" class="save-button" onclick="addTicket()">Add New Ticket</button>
     </div>
 
-
-    <table class="table table-striped" th:if="${#lists.size(ticketList) > 0}">
+    <table th:if="${#lists.size(ticketList) > 0}">
         <thead>
         <th>Id</th>
         <th>Ticket Date</th>
         <th>Ticket Time</th>
         <th>Ticket Title</th>
-        <!--    <th>Applicant</th>-->
         <th>Request</th>
         <th>Group</th>
         <th>Status</th>
@@ -37,17 +32,17 @@
             <td th:text="${ticket.ticketTimeStamp.toLocalDate()}"></td>
             <td th:text="${ticket.ticketTimeStamp.toLocalTime()}"></td>
             <td th:text="${ticket.title}"></td>
-            <!--        <td th:text="${ticket.applicant}"></td>-->
             <td th:text="${ticket.request}"></td>
-            <td th:if="${ticket.group.parent != null}" th:text="${ticket.group.parent.title} + ' - ' + ${ticket.group.title}"></td>
+            <td th:if="${ticket.group.parent != null}"
+                th:text="${ticket.group.parent.title} + ' - ' + ${ticket.group.title}"></td>
             <td th:unless="${ticket.group.parent != null}" th:text="${ticket.group.title}"></td>
-            <td th:text="${ticket.status}"></td>
+            <td th:text="${ticket.status}"  id="status"></td>
             <td th:text="${ticket.deleted}"></td>
             <td>
-                <button class="btn btn-warning editButtonJobs" th:data-name="${ticket.id}"
+                <button class="edit-button" th:data-name="${ticket.id}"
                         th:onclick="findId(this.getAttribute('data-name'))">Edit
                 </button>
-                <button class="btn btn-danger deleteButtonJobs" th:data-name="${ticket.id}"
+                <button class="delete-button" th:data-name="${ticket.id}"
                         th:onclick="deleted(this.getAttribute('data-name'))">Delete
                 </button>
             </td>
@@ -55,182 +50,39 @@
 
         </tbody>
     </table>
-    >
 
-
-    <!--Save Modal-->
-    <div class="modal fade" id="saveModalTicket" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <form id="saveFormTicket">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="save__modal__title__jobs">Save New Ticket </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-
-
-                    <div class="modal-body">
-
-                        <div class="mb-3">
-                            <label for="title__add__ticket" class="col-form-label">Title :</label>
-                            <input type="text" name="title" class="form-control" id="title__add__ticket">
-                        </div>
-
-
-                        <div class="mb-3">
-                            <label for="request__add__ticket" class="col-form-label">Request :</label>
-                            <input type="text" name="request" class="form-control" id="request__add__ticket">
-                        </div>
-
-
-                        <label for="parent__add__ticket" class="col-form-label">Field :</label>
-                        <select class="form-select" aria-label="Default select example"
-                                id="parent__add__ticket"
-                                th:if="${#lists.size(ticketGroupParents) > 0}"
-                                onchange="handleSelectChange(event , 'parent__add__ticket')">
-                            <option selected disabled value="-1">Select The Relevant Group: </option>
-                            <option th:each="ticketGroup : ${ticketGroupParents}"
-                                    th:value="${ticketGroup.id}"
-                                    th:text="${ticketGroup.title}"
-                                    th:data-name="${ticketGroup.id}">
-                            </option>
-                        </select>
-
-                        <label for="child__add__ticket" class="col-form-label" style="display: none">Sub Group :</label>
-                        <select id="child__add__ticket" class="form-select" style="display: none"
-                                aria-label="Default select example">
-                        </select>
-
-                    </div>
-
-                </form>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button onclick="save()" class="btn btn-primary">Save</button>
-                </div>
+    <div id="saveModalTicket">
+        <div id="saveModalTicketContent">
+            <form id="saveFormTicket">
+                <div th:replace="~{/fragments/ticket-fragments :: ticketSaveFormContent('title','request','group') }"></div>
+            </form>
+            <div class="modal-footer">
+            <button onclick="save()" class="save-button">Save</button>
+            <button onclick="closeModal()" class="close-button">Close</button>
             </div>
         </div>
-
     </div>
-    <!--Edit Modal-->
-    <div class="modal fade" id="editModalTicket" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <form id="editFormTicket" >
 
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="edit__modal__title__ticket">Edit Ticket</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-
-
-                    <div class="modal-body">
-
-                        <div class="mb-3">
-                            <label for="id__edit__ticket" class="col-form-label">ID :</label>
-                            <input type="text" class="form-control" id="id__edit__ticket" name="id" readonly>
-                        </div>
-
-
-                        <div class="mb-3">
-                            <label for="title__edit__ticket" class="col-form-label">Title :</label>
-                            <input type="text" class="form-control" id="title__edit__ticket" name="title">
-                        </div>
-
-
-                        <div class="mb-3">
-                            <label for="request__edit__ticket" class="col-form-label">Request :</label>
-                            <input type="text" class="form-control" id="request__edit__ticket" name="request">
-                        </div>
-
-
-                        <div class="mb-3">
-                            <label for="ticketTimeStamp__edit__ticket" class="col-form-label">Date :</label>
-                            <input type="datetime-local" class="form-control" id="ticketTimeStamp__edit__ticket"
-                                   name="ticketTimeStamp">
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="status__edit__ticket" class="col-form-label">Status :</label>
-                            <select class="form-select" aria-label="Default select example" id="status__edit__ticket"
-                                    name="status">
-                                <option selected disabled value="-1">Choose Ticket Status :</option>
-                                <option value="unassigned">Unassigned</option>
-                                <option value="open">Open</option>
-                                <option value="answered">Answered</option>
-                                <option value="postponed">Postponed</option>
-                                <option value="closed">Closed</option>
-                            </select>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="deleted__edit__ticket" class="col-form-label">State:</label>
-                            <select class="form-select" aria-label="Default select example" id="deleted__edit__ticket"
-                                    name="deleted">
-                                <option selected disabled value="-1">Choose Ticket State :</option>
-                                <option value="true">Not Active</option>
-                                <option value="false">Active</option>
-                            </select>
-                        </div>
-
-                        <label for="parent__edit__ticket" class="col-form-label">Field :</label>
-                        <select class="form-select" aria-label="Default select example"
-                                id="parent__edit__ticket"
-                                th:if="${#lists.size(ticketGroupParents) > 0}"
-                                onchange="handleSelectChange(event , 'parent__edit__ticket')">
-                            <option selected disabled value="-1">Select The Relevant Group: </option>
-                            <option th:each="ticketGroup : ${ticketGroupParents}"
-                                    th:value="${ticketGroup.id}"
-                                    th:text="${ticketGroup.title}"
-                                    th:data-name="${ticketGroup.id}">
-                            </option>
-                        </select>
-
-                        <label for="child__edit__ticket" class="col-form-label" style="display: none">Sub Group :</label>
-                        <select id="child__edit__ticket" class="form-select" style="display: none"
-                                aria-label="Default select example">
-                        </select>
-
-
-                    </div>
-                </form>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary" id="submitEditModal__ticket" onclick="edit()">
-                        Edit
-                    </button>
-                </div>
+    <div id="editModalTicket">
+        <div id="editModalTicketContent">
+            <form id="editFormTicket">
+                <label for="id__edit__ticket" >ID :</label>
+                <input type="text" id="id__edit__ticket" name="id" readonly>
+                <div th:replace="~{/fragments/ticket-fragments :: ticketEditFormContent('title','request','status','ticketTimeStamp','status','state','group')}"></div>
+            </form>
+            <div class="modal-footer">
+            <button onclick="edit()" class="edit-button">Edit</button>
+            <button onclick="closeModal()" class="close-button">Close</button>
             </div>
         </div>
-
     </div>
 
+
 </div>
-<!--todo : check popup body - Mahoor-->
-<div class="popup" id="popup">
-    <div class="popup-content" id="popup-content">
-            <span class="material-symbols-outlined popup-info" id="popup-info">
-                check_circle
-            </span>
+<div th:replace="~{/fragments/popup-fragment}"></div>
 
-        <span class="material-symbols-outlined popup-error" id="popup-error">
-                error
-            </span>
+<script type="text/javascript" src="../static/js/popup.js"></script>
+<script type="text/javascript" src="../static/js/ticket.js"></script>
 
-        <div class="popup-message" id="popup-message">
-            <span class="text text-1 popup-title" id="popup-title"></span>
-            <span class="text text-2 popup-text" id="popup-text"></span>
-        </div>
-    </div>
-    <span class="material-symbols-outlined popup-close" id="popup-close">
-            close
-        </span>
-    <div class="popup-progress" id="popup-progress"></div>
-</div>
-
-<script type="text/javascript" src="webjars/bootstrap/5.3.2/js/bootstrap.min.js"></script>
-<script type="text/javascript" src="webjars/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
-<script type="text/javascript" src="/js/popup.js"></script>
-<script type="text/javascript" th:src="@{js/ticket.js}" src="../static/js/ticket.js"></script>
 </body>
 </html>

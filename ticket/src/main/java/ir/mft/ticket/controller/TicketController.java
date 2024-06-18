@@ -1,23 +1,35 @@
 package ir.mft.ticket.controller;
 
+
+import ir.mft.ticket.enums.Status;
+import ir.mft.ticket.exceptions.NoContentException;
 import ir.mft.ticket.model.Ticket;
+import ir.mft.ticket.service.TicketGroupServiceImp;
 import ir.mft.ticket.service.TicketServiceImp;
+import jakarta.validation.Valid;
+import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Controller
-@RequestMapping(value ="/ticket")
+@RequestMapping(value = "/ticket")
 public class TicketController {
     private TicketServiceImp ticketServiceImp;
+    private TicketGroupServiceImp ticketGroupServiceImp;
 
-    public TicketController(TicketServiceImp ticketServiceImp) {
+
+    public TicketController(TicketServiceImp ticketServiceImp, TicketGroupServiceImp ticketGroupServiceImp) {
         this.ticketServiceImp = ticketServiceImp;
+        this.ticketGroupServiceImp = ticketGroupServiceImp;
+
     }
 
     @GetMapping
@@ -25,84 +37,100 @@ public class TicketController {
         log.info("Controller-Ticket-Get-FindAll");
         model.addAttribute("ticket", new Ticket());
         model.addAttribute("ticketList", ticketServiceImp.findAll());
-        return "ticketForm";
+        model.addAttribute("ticketGroupParents", ticketGroupServiceImp.findByParentRoot());
+        return "ticket" ;
     }
 
-    @GetMapping(value ="/id/{id}")
+    @PostMapping()
     @ResponseBody
-    public Ticket showTicketById(@PathVariable("id") Long id , Model model){
-        log.info("Controller-Ticket-Get-FindById");
-        Ticket ticket = ticketServiceImp.findById(id);
-        if (ticket != null){
-            log.info(ticket.toString());
-//            model.addAttribute("ticketEdit", ticket);
-            log.info(ticket.toString());
-            return ticket;
-        }else {
+    public Ticket saveTicket(@Valid Ticket ticket, BindingResult bindingResult) throws NoContentException {
+        if (bindingResult.hasErrors()) {
+            log.error("Controller-Ticket-Post-Save-Error: " + ticket.toString());
+            throw new ValidationException(
+                    bindingResult
+                            .getAllErrors()
+                            .stream()
+                            .map((event) -> event.getDefaultMessage()
+                            ).collect(Collectors.toList()).toString()
+            );
+        }
+        log.info("Controller-Ticket-Post-Save: " + ticket.toString());
+        return ticketServiceImp.save(ticket);
+    }
+
+    @PutMapping()
+    @ResponseBody
+    public Ticket editTicket(@Valid Ticket ticket, BindingResult bindingResult) throws NoContentException {
+        if (bindingResult.hasErrors()) {
+            log.error("Controller-Ticket-Put-Edit-Error: " + ticket.toString());
+            throw new ValidationException(
+                    bindingResult
+                            .getAllErrors()
+                            .stream()
+                            .map((event) -> event.getDefaultMessage()
+                            ).collect(Collectors.toList()).toString()
+            );
+        }
+        return ticketServiceImp.edit(ticket);
+
+    }
+
+    @DeleteMapping(value = "/{id}")
+    @ResponseBody
+    public Ticket deleteTicket(@PathVariable Long id, Model model) throws NoContentException {
+        log.info("Controller-Ticket-Delete-Delete: " + id);
+        return ticketServiceImp.logicalRemove(id);
+    }
+
+
+    @GetMapping(value = "/{id}")
+    @ResponseBody
+    public Ticket showTicket(@PathVariable("id") Long id) throws NoContentException {
+        log.info("Controller-Ticket-Get-FindById: " + id);
+        return ticketServiceImp.findById(id);
+    }
+
+
+
+    @GetMapping(value = "/date/{date}")
+    @ResponseBody
+    public List<Ticket> showTicketsByTimeStamp( @PathVariable("date") LocalDateTime timeStamp) throws NoContentException {
+        log.info("Controller-Ticket-Get-FindByDate");
+        List<Ticket> ticketList = ticketServiceImp.findByDate(timeStamp);
+        return ((ticketList.isEmpty()) ? null : ticketList);
+    }
+
+    @GetMapping(value = "/title/{title}")
+    @ResponseBody
+    public List<Ticket> showTicketsByTitle( @PathVariable("title") String  title) throws NoContentException {
+        log.info("Controller-Ticket-Get-FindByTitle");
+        List<Ticket> ticketList = ticketServiceImp.findByTitle(title);
+        System.out.println("TicketList");
+        System.out.println(ticketList);
+        return ((ticketList.isEmpty()) ? null : ticketList);
+    }
+
+    @GetMapping(value = "/title")
+    @ResponseBody
+    public List<String> showTicketsByTitle() throws NoContentException {
+        log.info("Controller-Ticket-Get-FindAll");
+        try{List<String> ticketList = ticketServiceImp.findAllTitle();
+            return ((ticketList.isEmpty()) ? null : ticketList);
+        }catch (Exception e){
+            e.printStackTrace();
             return null;
         }
     }
 
-//    @GetMapping(value ="/id")
-//    public String showTicket( Long id , Model model){
-//        log.info("Controller-Ticket-Get-FindById");
-//        Ticket ticket = ticketServiceImp.findById(id);
-//        if (ticket != null){
-//            log.info(ticket.toString());
-//            model.addAttribute("ticketEdit", ticket);
-//            log.info(ticket.toString());
-//            return "redirect:/ticket";
-//        }else {
-//            return "ticketForm";
-//        }
-//    }
-
-    @GetMapping(value ="/applicant")
-    public String showTicketsByApplicant(Model model , @ModelAttribute("applicant") String applicant) {
-        log.info("Controller-Ticket-Get-FindByApplicant");
-        List<Ticket> ticketList = ticketServiceImp.findByApplicant(applicant);
-        if (!ticketList.isEmpty()){
-            model.addAttribute("ticketList", ticketList);
-            return "ticketForm";
-        }else {
-            return "error-404";
-        }
-    }
-
-    @GetMapping(value ="/date")
-    public String showTicketsByDate(Model model , @ModelAttribute("date") LocalDate date) {
-        log.info("Controller-Ticket-Get-FindByDate");
-        List<Ticket> ticketList = ticketServiceImp.findByDate(date);
-        if (!ticketList.isEmpty()){
-            model.addAttribute("ticketList", ticketList);
-            return "ticketForm";
-        }else {
-            return "error-404";
-        }
-    }
-
-    @PostMapping(value = "/save")
-    public String saveTicket(Ticket ticket) {
-        log.info("Controller-Ticket-Post-Save: " + ticket.toString());
-        log.info("Controller-Ticket-Post-Save");
-        ticketServiceImp.save(ticket);
-        return "redirect:/ticket";
-    }
-
-    @PostMapping(value ="/edit")
-    public String editTicket(Ticket ticket) {
-        log.info("Controller-Ticket-Post-Edit");
-        log.info("Controller-Ticket-Post-Edit" + ticket.toString());
+    @PostMapping("/{id}")
+    @ResponseBody
+    public void setStatus(@PathVariable Long id) throws NoContentException{
+        log.info("Controller-Ticket-Post-SetStatus");
+        Ticket ticket = ticketServiceImp.findById(id);
+        ticket.setStatus(Status.seen);
         ticketServiceImp.edit(ticket);
-        return "redirect:/ticket";
-    }
-
-    @PostMapping(value ="/delete")
-    public String deleteTicket(Long id) {
-        log.info("Controller-Ticket-Post-Delete: " + id);
-        ticketServiceImp.logicalRemove(id);
-        return "redirect:/ticket";
     }
 
 
 }
+
